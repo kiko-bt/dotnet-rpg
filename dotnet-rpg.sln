@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-rpg", "dotnet-rpg\dotnet-rpg.csproj", "{0A74865E-3ADC-4662-A9DD-F9BD59D5FA88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-rpg", "dotnet-rpg\dotnet-rpg.csproj", "{0A74865E-3ADC-4662-A9DD-F9BD59D5FA88}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-rpg.Models", "dotnet-rpg.Models\dotnet-rpg.Models.csproj", "{F0FF44CC-5FFC-4BB8-BA94-A03CF032560D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-rpg.Services", "dotnet-rpg.Services\dotnet-rpg.Services.csproj", "{A9530CB9-1C79-4B7F-BD82-674AD1C878D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-rpg.DataModels", "dotnet-rpg.DataModels\dotnet-rpg.DataModels.csproj", "{DB86B821-A5AE-4CE1-9A25-66300E53D6FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-rpg.Persistence", "dotnet-rpg.Persistence\dotnet-rpg.Persistence.csproj", "{E07140EE-B164-493C-8212-F6B3BE31407E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{0A74865E-3ADC-4662-A9DD-F9BD59D5FA88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A74865E-3ADC-4662-A9DD-F9BD59D5FA88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A74865E-3ADC-4662-A9DD-F9BD59D5FA88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0FF44CC-5FFC-4BB8-BA94-A03CF032560D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0FF44CC-5FFC-4BB8-BA94-A03CF032560D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0FF44CC-5FFC-4BB8-BA94-A03CF032560D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0FF44CC-5FFC-4BB8-BA94-A03CF032560D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9530CB9-1C79-4B7F-BD82-674AD1C878D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9530CB9-1C79-4B7F-BD82-674AD1C878D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9530CB9-1C79-4B7F-BD82-674AD1C878D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9530CB9-1C79-4B7F-BD82-674AD1C878D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB86B821-A5AE-4CE1-9A25-66300E53D6FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB86B821-A5AE-4CE1-9A25-66300E53D6FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB86B821-A5AE-4CE1-9A25-66300E53D6FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB86B821-A5AE-4CE1-9A25-66300E53D6FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E07140EE-B164-493C-8212-F6B3BE31407E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E07140EE-B164-493C-8212-F6B3BE31407E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E07140EE-B164-493C-8212-F6B3BE31407E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E07140EE-B164-493C-8212-F6B3BE31407E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
