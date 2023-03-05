@@ -17,10 +17,10 @@ namespace dotnet_rpg.Services.CharacterServices
             _context = context;
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetCharacters(int userId)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>();
-            var characters = await _context.Characters.ToListAsync();
+            var characters = await _context.Characters.Where(c => c.User!.Id == userId).ToListAsync();
 
             serviceResponse.Data = characters.Select(_mapper.Map<GetCharacterDTO>).ToList();
 

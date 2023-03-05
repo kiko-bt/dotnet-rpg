@@ -8,5 +8,6 @@ namespace dotnet_rpg.Persistence
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<Character> Characters => Set<Character>();
+        public DbSet<User> Users => Set<User>();
     }
 }

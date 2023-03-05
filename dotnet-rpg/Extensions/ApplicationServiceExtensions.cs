@@ -1,6 +1,8 @@
 ﻿using dotnet_rpg.Persistence;
 using dotnet_rpg.Services.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace dotnet_rpg.Extensions
 {
@@ -26,6 +28,18 @@ namespace dotnet_rpg.Extensions
             });
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<ICharacterService, CharacterService>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config.GetSection("AppSettings:Token").Value!)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
 
             return services;
