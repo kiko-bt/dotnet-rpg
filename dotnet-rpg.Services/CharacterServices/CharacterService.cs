@@ -3,6 +3,7 @@ using dotnet_rpg.DataModels.Character;
 using dotnet_rpg.Models;
 using dotnet_rpg.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace dotnet_rpg.Services.CharacterServices
 {
@@ -10,19 +11,27 @@ namespace dotnet_rpg.Services.CharacterServices
     {
         private readonly IMapper _mapper;
         private readonly DataContext _context;
+        private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor;
 
-        public CharacterService(IMapper mapper, DataContext context)
+        public CharacterService(IMapper mapper, DataContext context, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetCharacters(int userId)
+        private int GetUserId() => int.Parse(_httpContextAccessor.HttpContext!.User
+            .FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        public async Task<ServiceResponse<List<GetCharacterDTO>>> GetCharacters()
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>();
-            var characters = await _context.Characters.Where(c => c.User!.Id == userId).ToListAsync();
+            var characters = await _context.Characters
+                .Include(c => c.Weapon)
+                .Include(c => c.Skills)
+                .Where(c => c.User!.Id == GetUserId()).ToListAsync();
 
-            serviceResponse.Data = characters.Select(_mapper.Map<GetCharacterDTO>).ToList();
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToList();
 
             return serviceResponse;
         }
@@ -30,9 +39,12 @@ namespace dotnet_rpg.Services.CharacterServices
         public async Task<ServiceResponse<GetCharacterDTO>> GetCharacterById(int id)
         {
             var serviceResponse = new ServiceResponse<GetCharacterDTO>();
-            var characters = await _context.Characters.ToListAsync();
+            var character = await _context.Characters
+                .Include(c => c.Weapon)
+                .Include(c => c.Skills)
+                .FirstOrDefaultAsync(x => x.Id == id && 
+                x.User!.Id == GetUserId());
 
-            var character = characters.FirstOrDefault(x => x.Id == id);
             serviceResponse.Data = _mapper.Map<GetCharacterDTO>(character);
 
             return serviceResponse;
@@ -42,10 +54,12 @@ namespace dotnet_rpg.Services.CharacterServices
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDTO>>();
             var character = _mapper.Map<Character>(newCharacter);
+            character.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
 
-            await _context.Characters.AddAsync(character);
+            _context.Characters.Add(character);
             await _context.SaveChangesAsync();
             serviceResponse.Data = await _context.Characters
+                .Where(c => c.User!.Id == GetUserId())
                 .Select(c => _mapper.Map<GetCharacterDTO>(c))
                 .ToListAsync();
 
@@ -58,8 +72,11 @@ namespace dotnet_rpg.Services.CharacterServices
 
             try
             {
-                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id)
-                    ?? throw new Exception($"Character with Id {updatedCharacter.Id} not found.");
+                var character = await _context.Characters
+                    .Include(c => c.User)
+                    .FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id);
+                    if (character is null || character.User!.Id != GetUserId())
+                        throw new Exception($"Character with Id {updatedCharacter.Id} not found.");
 
                 _mapper.Map(updatedCharacter, character);
 
@@ -89,13 +106,16 @@ namespace dotnet_rpg.Services.CharacterServices
 
             try
             {
-                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id)
+                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id && c.User!.Id == GetUserId())
                     ?? throw new Exception($"Character with Id {id} not found.");
 
                 _context.Characters.Remove(character);
                 await _context.SaveChangesAsync();  
 
-                serviceResponse.Data = await _context.Characters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToListAsync();
+                serviceResponse.Data = await _context.Characters
+                    .Where(c => c.User!.Id == GetUserId())
+                    .Select(c => _mapper.Map<GetCharacterDTO>(c))
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -104,6 +124,47 @@ namespace dotnet_rpg.Services.CharacterServices
             }
 
             return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<GetCharacterDTO>> AddCharacterSkill(AddCharacterSkillDTO newCharacterSkill)
+        {
+            ServiceResponse<GetCharacterDTO> response = new();
+
+            try
+            {
+                var charcter = await _context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
+                    .FirstOrDefaultAsync(c => c.Id == newCharacterSkill.CharacterId && 
+                    c.User!.Id == GetUserId());
+
+                if (charcter == null) 
+                { 
+                    response.Success = false;
+                    response.Message = "Character not found.";
+                    return response;
+                }
+
+                var skill = await _context.Skills
+                    .FirstOrDefaultAsync(s => s.Id == newCharacterSkill.SkillId);
+                if (skill == null)
+                {
+                    response.Success = false;
+                    response.Message = "Skill not found.";
+                    return response;
+                }
+
+                charcter.Skills!.Add(skill);
+                await _context.SaveChangesAsync();
+                response.Data = _mapper.Map<GetCharacterDTO>(charcter);
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
     }
 }
